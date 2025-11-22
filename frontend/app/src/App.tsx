@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import './App.css'
+import ImmersiveHome from './pages/ProjectPage'
 
-type Screen = 'menu' | 'resume' | 'behavioral' | 'tech'
+type Screen = 'menu' | 'resume' | 'behavioral' | 'tech' | 'immersive'
 
-const screenConfig: Record<Screen, { title: string; body: string }> = {
+const screenConfig:Record<Screen, { title: string; body: string }> = {
   menu: { title: 'Main Menu', body: 'Choose a feature to test.' },
   resume: {
     title: 'Resume Builder',
@@ -17,12 +18,21 @@ const screenConfig: Record<Screen, { title: string; body: string }> = {
     title: 'Technical Prep',
     body: 'Placeholder screen for technical interview tooling.',
   },
+  immersive: {
+    title: 'Immersive Workspace',
+    body: '3D Interactive Environment',
+  }
 }
 
-const featureOrder: Screen[] = ['resume', 'behavioral', 'tech']
+const featureOrder: Screen[] = ['resume', 'behavioral', 'tech', 'immersive']
 
 function App() {
-  const [screen, setScreen] = useState<Screen>('menu')
+  const [screen, setScreen] = useState<Screen>('immersive')
+
+  // Render the immersive view outside the standard app shell for full screen experience
+  if (screen === 'immersive') {
+    return <ImmersiveHome onBack={() => setScreen('menu')} />
+  }
 
   return (
     <main className="app-shell">
