@@ -64,3 +64,274 @@
   font-size: 0.85rem;
   color: #666;
 }
+
+
+.ih-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #f5f5f7;
+    z-index: 50; /* Ensure it sits on top of everything */
+    overflow: hidden;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #1d1d1f;
+}
+
+/* 3D Canvas Container */
+.ih-canvas-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* UI Overlay Layer */
+.ih-ui-layer {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Let clicks pass through to canvas where needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+/* Main Layout Grid */
+.ih-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr; /* Fixed sidebar, fluid content */
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1400px;
+    height: 90vh;
+    pointer-events: auto; /* Re-enable clicks for UI elements */
+    animation: ih-floatIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Sidebar */
+.ih-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.5rem 0;
+    border-radius: 24px;
+    height: 100%;
+    
+    /* Glassmorphism */
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+/* Content Area */
+.ih-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding-left: 1rem;
+}
+
+/* Header */
+.ih-header {
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem 2rem;
+    border-radius: 9999px;
+    margin-bottom: 1rem;
+    
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.ih-title {
+    font-size: 1.5rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.ih-time {
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.6;
+}
+
+/* Buttons */
+.ih-btn {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.5);
+    color: #1d1d1f;
+}
+
+.ih-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.ih-btn.active {
+    background: #1d1d1f;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Tooltip (Label) */
+.ih-label {
+    position: absolute;
+    left: 3.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    color: #000;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.ih-btn:hover .ih-label {
+    opacity: 1;
+}
+
+/* Back Button Specifics */
+.ih-back-btn {
+    width: auto;
+    height: auto;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    background: transparent;
+    color: #1d1d1f;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+.ih-back-btn:hover {
+    background: #1d1d1f;
+    color: white;
+}
+
+/* Widgets Grid */
+.ih-widgets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.ih-widget {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.ih-widget:hover {
+    background: rgba(255, 255, 255, 0.85);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.ih-widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.ih-icon-box {
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ih-widget-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.4;
+}
+
+.ih-widget-value {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.ih-widget-sub {
+    font-size: 0.875rem;
+    opacity: 0.5;
+    margin-top: 0.25rem;
+}
+
+/* Utilities */
+.ih-logo {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: #000;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.ih-profile {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+
+@keyframes ih-floatIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 768px) {
+    .ih-grid {
+        grid-template-columns: 80px 1fr;
+    }
+    .ih-widgets {
+        grid-template-columns: 1fr;
+    }
+    .ih-label {
+        display: none;
+    }
+}
