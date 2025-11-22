@@ -71,3 +71,28 @@ export default defineConfig([
   },
 ])
 ```
+
+  ## Running the barebones UI for testing
+
+  These instructions assume you are inside the `frontend/app` folder (you can `cd frontend/app` from the repo root) and that Node.js/npm are installed.
+
+  ### Common setup (Mac & Windows)
+
+  1. Install dependencies:
+
+  ```bash
+  npm install
+  ```
+
+  2. Start the dev server (either terminal):
+
+  ```bash
+  npm run dev -- --host 0.0.0.0 --port 5173
+  ```
+
+  Open http://localhost:5173 in your browser and use the main menu to switch between resume builder, behavioral prep, and tech prep screens for testing.
+
+  ### Additional platform notes
+
+  - **macOS** (Terminal, iTerm, etc.): Use the commands above directly. `npm run dev -- --host 0.0.0.0` allows another device on your LAN to reach the server if needed.
+  - **Windows** (PowerShell): The commands work the same, but run them in PowerShell or Windows Terminal. If you get a `command not found` error, run `.\node_modules\.bin\vite --host 0.0.0.0 --port 5173` instead.
