@@ -7,8 +7,33 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types 
 
-_ENV_PATH = Path(__file__).resolve().parent / ".env"
-load_dotenv(dotenv_path=_ENV_PATH, override=False)
+_FILE_PATH = Path(__file__).resolve()
+_ENV_SEARCH_PATHS: list[Path] = []
+_seen: set[Path] = set()
+
+for depth in range(0, 4):
+    try:
+        directory = _FILE_PATH.parents[depth]
+    except IndexError:
+        break
+    candidate = directory / ".env"
+    if candidate not in _seen:
+        _ENV_SEARCH_PATHS.append(candidate)
+        _seen.add(candidate)
+
+cwd_candidate = Path.cwd() / ".env"
+if cwd_candidate not in _seen:
+    _ENV_SEARCH_PATHS.append(cwd_candidate)
+
+_loaded = False
+for env_path in _ENV_SEARCH_PATHS:
+    if env_path.is_file():
+        load_dotenv(dotenv_path=env_path, override=False)
+        _loaded = True
+        break
+
+if not _loaded:
+    load_dotenv(override=False)
 
 class GeminiClient:
     """Gemini Client (Google Gen AI SDK v1.0+)"""
