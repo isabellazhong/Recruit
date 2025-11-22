@@ -1,0 +1,95 @@
+\documentclass[10pt]{article}
+\usepackage{geometry}
+\geometry{margin=0.5in}
+
+\usepackage{enumitem}
+\setlist[itemize]{noitemsep,topsep=2pt,parsep=0pt,partopsep=0pt,leftmargin=1.5em}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{8pt}{4pt}
+\titleformat{\section}{\Large\bfseries\raggedright}{}{0em}{}
+
+\usepackage{ragged2e}
+
+\newcommand{\entry}[4]{
+    \textbf{#1} \hfill \textbf{#2} \\
+    #3 \hfill #4 \\
+    \vspace{2pt}
+}
+
+\begin{document}
+\RaggedRight
+
+\begin{center}
+    {\Huge\bfseries Isabella Zhong} \\
+    \vspace{2pt}
+    \href{mailto:isabellazhong888@gmail.com}{\color{black}isabellazhong888@gmail.com} $|$ (647) 537-6108 $|$ \href{https://linkedin.com/in/isabella-zhong}{\color{black}linkedin.com/in/isabella-zhong} $|$ \href{https://github.com/isabellazhong}{\color{black}github.com/isabellazhong}
+\end{center}
+
+\vspace{8pt}
+
+\section*{EDUCATION}
+\entry{University of Toronto}{Sep 2024 -- 2028 (Expected)}{Bachelor of Science, Computer Science Major}{}
+\begin{itemize}
+    \item Cultivating strong understanding of Computer Science fundamentals, data structures, and algorithms through comprehensive coursework.
+    \item Relevant Coursework: Software Design, Foundations of Computer Science II, Theory of Computation.
+    \item Clubs: Google Developer Group, University of Toronto Machine Intelligence Student Team.
+\end{itemize}
+
+\section*{EXPERIENCE}
+\entry{BMO}{Apr 2025 -- Aug 2025}{Software Developer Intern}{}
+\begin{itemize}
+    \item Developed an LLM-powered RAG model with AWS Bedrock, optimizing software development lifecycle (SDLC) efficiency in an agile environment.
+    \item Architected and deployed scalable cloud infrastructure using AWS S3, SQS, and API Gateway via AWS CDK.        
+    \item Ensured code quality and reliability by developing unit tests for semantic chunking in Java, Python, and JavaScript, achieving 90\% code coverage.
+    \item Designed and implemented a Next.js-based chatbot interface, integrating with MCP backend and successfully demonstrating to stakeholders.
+    \item \textit{Tech Stack:} Typescript, Python, AWS (S3, SQS, API Gateway), Next.js.
+\end{itemize}
+
+\section*{LEADERSHIP}
+\entry{Google Developer Club}{Apr 2025 -- Present}{Marketing Vice Lead}{}
+\begin{itemize}
+    \item Led a 20-member marketing team, overseeing graphic design and social media initiatives for 500+ attendees.    
+    \item Collaborated with executive leadership to align marketing strategies with product and event launches.
+    \item Increased social media engagement by over 600\% and boosted applicant engagement by 50\% through innovative campaigns.
+\end{itemize}
+
+\section*{PROJECTS}
+\entry{Hack the Valley -- Justastartup}{Oct 2025}{Full-Stack Business Accelerator}{}
+\begin{itemize}
+    \item Developed a full-stack business accelerator prototype providing automated insights for business planning.     
+    \item Integrated SerpApi for real-time competitor and trend analysis to inform strategic decisions.
+    \item Deployed scalable infrastructure using Vercel and Supabase, optimizing performance and user experience.       
+    \item \textit{Tech Stack:} Typescript, React, Supabase, Vercel.
+\end{itemize}
+
+\entry{Hack the 6ix -- Marker}{July 2025}{Multimodal RAG Pipeline}{}
+\begin{itemize}
+    \item Collaborated in a multidisciplinary team on a full-stack prototype to enhance student learning.
+    \item Implemented a multimodal RAG pipeline using FAISS and LangChain for intelligent document search and retrieval.
+    \item \textit{Tech Stack:} Python, Next.js, LangChain.
+\end{itemize}
+
+\entry{ReturnX -- Hack the Future Case Competition}{Mar 2025}{FinTech Solution Prototype}{}
+\begin{itemize}
+    \item Conceptualized a sustainable FinTech solution to mitigate e-commerce return inefficiencies.
+    \item Designed intuitive UI/UX using Figma, adhering to established design principles.
+    \item Awarded Top 5 Finalist (out of 36 teams) at Google Headquarters for innovative problem-solving.
+    \item \textit{Tech Stack:} Figma.
+\end{itemize}
+
+\section*{SKILLS}
+\textbf{Languages:} Java, Python, JavaScript, TypeScript, HTML/CSS \\
+\textbf{Frameworks/Libraries:} React, Next.js, NumPy, Pandas, Svelte, Tailwind CSS, LangChain, MCP \\
+\textbf{Tools \& Platforms:} AWS CDK, Git, Figma, Vercel, Supabase \\
+\textbf{Methodologies \& Concepts:} Scrum Development, Design Thinking, Agile, Data Structures \& Algorithms
+
+\end{document}
