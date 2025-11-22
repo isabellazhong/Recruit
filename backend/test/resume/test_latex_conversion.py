@@ -1,12 +1,13 @@
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-# Ensure imports resolve when the script is executed via an absolute path
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+BACKEND_DIR = Path(__file__).resolve().parents[2]
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 
-from backend.gemini.gemini_client import GeminiClient
+from gemini.gemini_client import GeminiClient
+from use_cases.job_formatter import JobFormatter
+from use_cases.resume_editor import ResumeEditor
 
 if __name__ == "__main__":
     job = """
@@ -27,7 +28,14 @@ What we’re looking for:
 • Non-academic coding experience (i.e. hack-a-thons, code challenges, personal projects, GitHub, Open Source, volunteer coding experience, conference participation, etc.)
 • A curious nature with a desire to tackle and solve complex problem
     """
+
     client = GeminiClient(model="gemini-2.5-flash")
-    file = client.upload_pdf("backend/gemini/test/Isabella Zhong Resume - Amazon.pdf")
-    latex = client.generate_latex_resume(file, job_description=job, accuracy=80)
+    job_formatter = JobFormatter(client, job)
+
+    job_desc = job_formatter.summarize_job_description()
+    resume_editor = ResumeEditor(client, job_desc)
+
+    resume_path = Path(__file__).resolve().with_name("Isabella Zhong Resume - Amazon.pdf")
+    file = client.upload_pdf(str(resume_path))
+    latex = resume_editor.generate_latex_resume(file)
     print(latex)

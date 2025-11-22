@@ -1,10 +1,14 @@
 import os
+import re
 import mimetypes 
 from pathlib import Path
-from typing import Any
 
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types 
+
+_ENV_PATH = Path(__file__).resolve().parent / ".env"
+load_dotenv(dotenv_path=_ENV_PATH, override=False)
 
 class GeminiClient:
     """Gemini Client (Google Gen AI SDK v1.0+)"""
@@ -64,21 +68,12 @@ class GeminiClient:
             )
         )
     
-    def generate_latex_resume(self, file: types.File, job_description: str, accuracy: int):
-        prompt = (
-            "You are a resume perfector. Turn this file into LaTeX.\n"
-            "Reformat the resume if there are inconsistencies in spacing, font, etc.\n"
-            "If the resume is not one page, adjust font-size to fit one page.\n"
-            "Adjust wording to match key words in the description below so there is "
-            f"at least a {accuracy}% chance it passes screening.\n\n"
-            f"JOB DESCRIPTION:\n{job_description}"
-        )
+    def getResponse(self, query:str):
+        response = self.client.models.generate_content(model=self.model, contents=query)
+        return response.text
 
-        response = self.client.models.generate_content(
-            model=self.model,
-            contents=[prompt, file]
-        )
-
+    def getFileResponse(self, query:str, file:types.File):
+        response = self.client.models.generate_content(model=self.model, contents=[query, file])
         return response.text
 
     def _validate_path(self, file_path: str) -> Path:
