@@ -18,6 +18,7 @@ from .project_storage import (
 from .use_cases.resume_editor import ResumeEditor
 from .use_cases.technical_questions import TechnicalQuestionsGenerator
 from .gemini.gemini_client import GeminiClient
+from .use_cases.behavioral_questions import generate_behavioral_questions
 
 GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
 GEMINI_CLIENT = GeminiClient(model=GEMINI_MODEL_NAME)
@@ -49,6 +50,10 @@ class JobDescriptionPayload(BaseModel):
 class TechnicalQuestionsPayload(BaseModel):
     job_description: str
     top_k: int | None = 3
+
+class BehavioralQuestionsPayload(BaseModel):
+    resume_text: str
+    job_description: str
 
 
 @app.post("/api/projects/latest/resume")
@@ -131,6 +136,26 @@ async def get_technical_questions(payload: TechnicalQuestionsPayload) -> dict:
         raise HTTPException(status_code=500, detail=f"Failed to fetch technical questions: {exc}") from exc
 
     return {"questions": questions}
+
+@app.post("/api/behavioral-questions")
+async def get_behavioral_questions(payload: BehavioralQuestionsPayload) -> dict:
+    resume_text = payload.resume_text.strip()
+    job_desc = payload.job_description.strip()
+
+    if not resume_text:
+        raise HTTPException(status_code=400, detail="Resume text is empty.")
+    if not job_desc:
+        raise HTTPException(status_code=400, detail="Job description text is empty.")
+
+    try:
+        return generate_behavioral_questions(GEMINI_CLIENT, resume_text, job_desc)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate behavioral questions: {exc}",
+        ) from exc
 
 
 if __name__ == "__main__":

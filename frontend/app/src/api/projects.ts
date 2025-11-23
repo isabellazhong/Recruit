@@ -85,6 +85,10 @@ export interface TechnicalQuestion {
     language?: string;
 }
 
+export interface BehavioralQuestionsResponse {
+    questions: string[];
+}
+
 export async function convertResumeToLatex(resumeFile: File, jobDescription?: string): Promise<LatexConversionResponse> {
     const formData = new FormData();
     formData.append("resume", resumeFile);
@@ -128,5 +132,29 @@ export async function fetchTechnicalQuestions(
     }
 
     const data = await response.json();
+    return Array.isArray(data.questions) ? data.questions : [];
+}
+
+export async function fetchBehavioralQuestions(
+    resumeText: string,
+    jobDescription: string,
+): Promise<string[]> {
+    const payload = {
+        resume_text: resumeText.trim(),
+        job_description: jobDescription.trim(),
+    };
+
+    const response = await fetch(`${API_BASE_URL}/api/behavioral-questions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to generate behavioral questions");
+    }
+
+    const data: BehavioralQuestionsResponse = await response.json();
     return Array.isArray(data.questions) ? data.questions : [];
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ChangeEvent } from 'react';
 import * as THREE from 'three';
 import "./ProjectPage.css";
@@ -14,7 +14,8 @@ import {
   XCircle
 } from 'lucide-react';
 import TechnicalPractice from '../../components/project_page/TechnicalPractice';
-import { convertResumeToLatex, uploadOriginalResume } from '../../api/projects';
+import BehavioralPractice from './VideoInterview';
+import { convertResumeToLatex, uploadOriginalResume, fetchBehavioralQuestions } from '../../api/projects';
 
 type ViewType = 'resume' | 'technical' | 'behavior';
 
@@ -50,9 +51,43 @@ interface ResumeUploadProps {
   jobDescription: string;
   onResumeUpdate: (data: ResumeData) => void;
   onJobDescriptionUpdate: (value: string) => void;
+  onBehavioralQuestionsGenerate: (resumeText: string, jobDescription: string) => Promise<void>;
 }
 
 type ToastState = { message: string; type: 'success' | 'error' } | null;
+
+const buildResumePlainText = (data: ResumeData): string => {
+  const sections: string[] = [];
+
+  sections.push(`Name: ${data.name}`);
+  sections.push(`Contact: ${data.email} | ${data.phone}`);
+  if (data.summary) {
+    sections.push(`Summary: ${data.summary}`);
+  }
+
+  if (data.experience?.length) {
+    const experienceBlock = data.experience
+      .map(
+        (exp) =>
+          `${exp.title} at ${exp.company} (${exp.duration})\nImpact: ${exp.description}`,
+      )
+      .join('\n');
+    sections.push(`Experience:\n${experienceBlock}`);
+  }
+
+  if (data.education?.length) {
+    const educationBlock = data.education
+      .map((edu) => `${edu.degree} - ${edu.school} (${edu.year})`)
+      .join('\n');
+    sections.push(`Education:\n${educationBlock}`);
+  }
+
+  if (data.skills?.length) {
+    sections.push(`Skills: ${data.skills.join(', ')}`);
+  }
+
+  return sections.filter(Boolean).join('\n\n');
+};
 
 function Toast({ state }: { state: ToastState }) {
   if (!state) return null;
@@ -64,7 +99,13 @@ function Toast({ state }: { state: ToastState }) {
   );
 }
 
-function ResumeUpload({ resumeData, jobDescription, onResumeUpdate, onJobDescriptionUpdate }: ResumeUploadProps) {
+function ResumeUpload({
+  resumeData,
+  jobDescription,
+  onResumeUpdate,
+  onJobDescriptionUpdate,
+  onBehavioralQuestionsGenerate,
+}: ResumeUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [converting, setConverting] = useState(false);
   const [latexCode, setLatexCode] = useState('');
@@ -149,6 +190,15 @@ function ResumeUpload({ resumeData, jobDescription, onResumeUpdate, onJobDescrip
       setLatexCode(latex);
       setActiveTab('code');
       showToast('Converted to LaTeX');
+
+      if (resumeData && jobDescription.trim()) {
+        try {
+          await onBehavioralQuestionsGenerate(buildResumePlainText(resumeData), jobDescription);
+          showToast('Behavioral questions refreshed');
+        } catch (error) {
+          showToast((error as Error).message ?? 'Failed to refresh behavioral questions', 'error');
+        }
+      }
     } catch (error) {
       showToast((error as Error).message ?? 'Failed to convert resume', 'error');
     } finally {
@@ -306,6 +356,35 @@ export default function ProjectPage({ onBack }: ProjectPageProps) {
   const [activeView, setActiveView] = useState<ViewType>('resume');
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [jobDescription, setJobDescription] = useState('');
+  const [behavioralQuestions, setBehavioralQuestions] = useState<string[]>([]);
+  const [isBehavioralLoading, setIsBehavioralLoading] = useState(false);
+  const [behavioralError, setBehavioralError] = useState<string | null>(null);
+  const [hasRequestedBehavioral, setHasRequestedBehavioral] = useState(false);
+
+  const handleBehavioralQuestionsGenerate = useCallback(async (resumeText: string, jobDesc: string) => {
+    const resumePayload = resumeText.trim();
+    const jobPayload = jobDesc.trim();
+
+    if (!resumePayload || !jobPayload) {
+      return;
+    }
+
+    setHasRequestedBehavioral(true);
+    setIsBehavioralLoading(true);
+    setBehavioralError(null);
+    setBehavioralQuestions([]);
+
+    try {
+      const questions = await fetchBehavioralQuestions(resumePayload, jobPayload);
+      setBehavioralQuestions(questions);
+    } catch (error) {
+      const message = (error as Error).message ?? 'Unable to generate behavioral questions.';
+      setBehavioralError(message);
+      throw error;
+    } finally {
+      setIsBehavioralLoading(false);
+    }
+  }, []);
 
   // Refs for 3D objects to access inside the animation loop without dependencies
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -599,6 +678,7 @@ export default function ProjectPage({ onBack }: ProjectPageProps) {
                 jobDescription={jobDescription}
                 onResumeUpdate={setResumeData}
                 onJobDescriptionUpdate={setJobDescription}
+                onBehavioralQuestionsGenerate={handleBehavioralQuestionsGenerate}
               />
             )}
 
@@ -607,14 +687,14 @@ export default function ProjectPage({ onBack }: ProjectPageProps) {
             )}
 
             {activeView === 'behavior' && (
-              <div className="ih-placeholder">
-                <div className="ih-placeholder-content">
-                  <h2>{views[activeView].title}</h2>
-                  <p>
-                    Behavior prompts are getting polished. In the meantime, use the Resume Builder to tailor your profile.
-                  </p>
-                </div>
-              </div>
+              <BehavioralPractice
+                resumeData={resumeData}
+                jobDescription={jobDescription}
+                questions={behavioralQuestions}
+                loading={isBehavioralLoading}
+                error={behavioralError}
+                hasRequestedQuestions={hasRequestedBehavioral}
+              />
             )}
           </main>
         </div>
