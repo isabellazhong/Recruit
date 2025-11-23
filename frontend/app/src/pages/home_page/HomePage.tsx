@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { Dispatch, FormEvent, SetStateAction } from "react";
 import { Plus } from "lucide-react";
 import { ProjectPanel } from "../../components/home_page/ProjectPanel";
 import { useNavigate } from "react-router-dom";
@@ -17,30 +17,34 @@ type Project = {
 
 const INITIAL_PROJECTS: Project[] = [];
 
-export default function HomePage() {
+interface HomePageProps {
+	jobDescription: string;
+	setJobDescription: Dispatch<SetStateAction<string>>;
+}
+
+export default function HomePage({ jobDescription, setJobDescription }: HomePageProps) {
 	const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [projectTitle, setProjectTitle] = useState("");
-	const [jobFile, setJobFile] = useState<File | null>(null);
     const navigate = useNavigate(); 
     const openWorkspace = () => navigate('/workspace'); 
 
 
 	const handleCreateProject = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		if (!projectTitle.trim() || !jobFile) return;
+		if (!projectTitle.trim() || !jobDescription.trim()) return;
 
 		const newProject: Project = {
 			id: Date.now(),
 			title: projectTitle.trim(),
 			role: "Custom role",
 			lastUpdated: "Just now",
-			jobDescriptionName: jobFile.name,
+			jobDescriptionName: jobDescription.trim().slice(0, 40),
 		};
 
 		setProjects((prev) => [newProject, ...prev]);
 		setProjectTitle("");
-		setJobFile(null);
+		setJobDescription("");
 		setIsModalOpen(false);
 	};
 
@@ -82,8 +86,8 @@ export default function HomePage() {
 					onSubmit={handleCreateProject}
 					currProjectTitle={projectTitle}
 					setTitle={setProjectTitle}
-					jobFile={jobFile}
-					setJobFile={setJobFile}
+					jobDescription={jobDescription}
+					setJobDescription={setJobDescription}
 				/>
 			)}
 		</div>
