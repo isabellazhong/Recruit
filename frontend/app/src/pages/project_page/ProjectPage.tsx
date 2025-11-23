@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { ChangeEvent } from 'react';
 import * as THREE from 'three';
 import "./ProjectPage.css";
+import { uploadOriginalResume, updateLatestJobDescription } from '../../api/projects';
 import { 
   Monitor, 
   PenTool, 
@@ -77,12 +78,14 @@ function ResumeUpload({ resumeData, jobDescription, onResumeUpdate, onJobDescrip
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setUploading(true);
-    setTimeout(() => {
+    try {
+      await uploadOriginalResume(file);
+
       const mockResumeData: ResumeData = {
         name: 'Alex Developer',
         email: 'alex.dev@email.com',
@@ -113,9 +116,16 @@ function ResumeUpload({ resumeData, jobDescription, onResumeUpdate, onJobDescrip
       };
 
       onResumeUpdate(mockResumeData);
-      setUploading(false);
       showToast(`Uploaded ${file.name}`);
-    }, 1500);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to upload resume';
+      showToast(message, 'error');
+    } finally {
+      setUploading(false);
+      if (event.target) {
+        event.target.value = '';
+      }
+    }
   };
 
   const generateLatexResume = (data: ResumeData, desc: string) => {
@@ -158,19 +168,29 @@ ${data.skills.join(' $\\bullet$ ')}
 \\end{document}`;
   };
 
-  const convertToLatex = () => {
+  const convertToLatex = async () => {
     if (!resumeData) {
       showToast('Please upload a resume first', 'error');
       return;
     }
 
     setConverting(true);
-    setTimeout(() => {
+    try {
+      const trimmedDesc = jobDescription.trim();
+      if (trimmedDesc) {
+        await updateLatestJobDescription(trimmedDesc);
+        showToast('Job description saved');
+      }
+
       const latex = generateLatexResume(resumeData, jobDescription);
       setLatexCode(latex);
-      setConverting(false);
       showToast('Converted to LaTeX');
-    }, 2000);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save job description';
+      showToast(message, 'error');
+    } finally {
+      setConverting(false);
+    }
   };
 
   const downloadLatex = () => {
