@@ -73,6 +73,42 @@
     padding-left: 1rem;
 }
 
+.ih-main {
+    position: relative;
+    height: 100%;
+    border-radius: 32px;
+    background: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    padding: 2rem;
+    box-shadow: 0 25px 60px -20px rgba(0, 0, 0, 0.15);
+    pointer-events: auto;
+    overflow: hidden;
+}
+
+.ih-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.ih-placeholder-content {
+    text-align: center;
+    max-width: 420px;
+}
+
+.ih-placeholder-content h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.ih-placeholder-content p {
+    color: rgba(29, 29, 31, 0.7);
+    line-height: 1.6;
+}
+
 /* Header */
 .ih-header {
     align-self: flex-end;
@@ -249,6 +285,294 @@
     height: 2.5rem;
     border-radius: 50%;
     border: 2px solid rgba(255,255,255,0.5);
+}
+
+.ih-resume-upload {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.ih-resume-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    height: 100%;
+}
+
+.ih-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.ih-card-column {
+    padding: 1.5rem;
+}
+
+.ih-card-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.ih-card-header p {
+    margin: 0.35rem 0 0;
+    color: rgba(29, 29, 31, 0.6);
+    font-size: 0.95rem;
+}
+
+.ih-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.ih-card-body-stretch {
+    flex: 1;
+    min-height: 0;
+}
+
+.ih-dropzone {
+    border: 2px dashed rgba(17, 17, 26, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(248, 248, 250, 0.8);
+}
+
+.ih-dropzone:hover {
+    border-color: rgba(17, 17, 26, 0.4);
+    background: rgba(248, 248, 250, 1);
+}
+
+.ih-dropzone-loading {
+    animation: ih-pulse 1s ease-in-out infinite;
+}
+
+.ih-dropzone-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.ih-dropzone span {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.85rem;
+    color: rgba(17, 17, 26, 0.6);
+}
+
+.ih-hidden-input {
+    display: none;
+}
+
+.ih-uploaded-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(52, 199, 89, 0.15);
+    color: #1d6b34;
+    font-weight: 500;
+}
+
+.ih-field-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(17, 17, 26, 0.7);
+}
+
+.ih-textarea {
+    min-height: 110px;
+    border-radius: 16px;
+    border: 1px solid rgba(17, 17, 26, 0.1);
+    padding: 0.85rem 1rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: rgba(248, 248, 250, 0.8);
+    resize: none;
+}
+
+.ih-primary-btn,
+.ih-outline-btn {
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.85rem 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.ih-primary-btn {
+    background: #1d1d1f;
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.ih-primary-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.ih-outline-btn {
+    background: transparent;
+    border: 1px solid rgba(17, 17, 26, 0.2);
+    color: #1d1d1f;
+}
+
+.ih-tab-group {
+    display: inline-flex;
+    padding: 0.25rem;
+    border-radius: 999px;
+    background: rgba(17, 17, 26, 0.05);
+    margin-bottom: 1rem;
+}
+
+.ih-tab-btn {
+    border: none;
+    background: transparent;
+    padding: 0.5rem 1.2rem;
+    border-radius: 999px;
+    font-weight: 600;
+    color: rgba(17, 17, 26, 0.5);
+    cursor: pointer;
+}
+
+.ih-tab-btn.active {
+    background: #fff;
+    color: #1d1d1f;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.ih-output-panel {
+    flex: 1;
+    border-radius: 24px;
+    border: 1px solid rgba(17, 17, 26, 0.08);
+    background: rgba(248, 248, 250, 0.9);
+    padding: 1.25rem;
+    min-height: 0;
+}
+
+.ih-preview-scroll {
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.ih-preview-header {
+    text-align: center;
+    border-bottom: 1px solid rgba(17, 17, 26, 0.1);
+    padding-bottom: 1rem;
+}
+
+.ih-preview-header h4 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.ih-preview-header p {
+    margin: 0.35rem 0 0;
+    color: rgba(17, 17, 26, 0.6);
+}
+
+.ih-preview-section h5 {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+    color: rgba(17, 17, 26, 0.5);
+    margin-bottom: 0.6rem;
+}
+
+.ih-preview-experience {
+    margin-bottom: 0.9rem;
+}
+
+.ih-preview-title {
+    font-weight: 600;
+}
+
+.ih-preview-duration {
+    float: right;
+    font-size: 0.85rem;
+    color: rgba(17, 17, 26, 0.6);
+}
+
+.ih-preview-company {
+    font-style: italic;
+    color: rgba(17, 17, 26, 0.7);
+    margin: 0.2rem 0;
+}
+
+.ih-code-block {
+    height: 100%;
+    overflow: auto;
+    background: #111;
+    color: #f5f5f7;
+    border-radius: 18px;
+    padding: 1rem;
+    font-size: 0.85rem;
+}
+
+.ih-empty-state {
+    height: 100%;
+    border: 2px dashed rgba(17, 17, 26, 0.1);
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.5rem;
+    color: rgba(17, 17, 26, 0.6);
+}
+
+.ih-toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    z-index: 30;
+}
+
+.ih-toast-success {
+    background: #1d6b34;
+    color: #fff;
+}
+
+.ih-toast-error {
+    background: #d14343;
+    color: #fff;
+}
+
+@keyframes ih-pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
 }
 
 @keyframes ih-floatIn {
