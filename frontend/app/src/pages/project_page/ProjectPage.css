@@ -36,14 +36,71 @@
 
 /* Main Layout Grid */
 .ih-grid {
-    display: grid;
-    grid-template-columns: 280px 1fr; /* Fixed sidebar, fluid content */
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
     width: 100%;
     max-width: 1400px;
     height: 90vh;
     pointer-events: auto; /* Re-enable clicks for UI elements */
     animation: ih-floatIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.ih-topbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 5px 20px 5px 20px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+    pointer-events: auto;
+}
+
+.ih-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ih-topbar-buttons {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.ih-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.5);
+    color: #1d1d1f;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.ih-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.ih-nav-btn.active {
+    background: #1d1d1f;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Sidebar */
@@ -75,7 +132,8 @@
 
 .ih-main {
     position: relative;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
     border-radius: 32px;
     background: rgba(255, 255, 255, 0.35);
     border: 1px solid rgba(255, 255, 255, 0.6);
@@ -84,7 +142,7 @@
     padding: 2rem;
     box-shadow: 0 25px 60px -20px rgba(0, 0, 0, 0.15);
     pointer-events: auto;
-    overflow: hidden;
+    overflow: scroll;
 }
 
 .ih-placeholder {
@@ -193,7 +251,6 @@
     width: auto;
     height: auto;
     padding: 0.5rem;
-    margin-bottom: 1rem;
     border-radius: 50%;
     background: transparent;
     color: #1d1d1f;
@@ -262,22 +319,6 @@
     font-size: 0.875rem;
     opacity: 0.5;
     margin-top: 0.25rem;
-}
-
-/* Utilities */
-.ih-logo {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    background: #000;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .ih-profile {

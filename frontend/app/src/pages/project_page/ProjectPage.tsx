@@ -3,9 +3,7 @@ import type { ChangeEvent } from 'react';
 import * as THREE from 'three';
 import "./ProjectPage.css";
 import { 
-  Monitor, 
   PenTool, 
-  Sun, 
   Settings2, 
   ArrowLeft,
   Upload,
@@ -16,7 +14,7 @@ import {
   XCircle
 } from 'lucide-react';
 
-type ViewType = 'desk' | 'whiteboard' | 'window';
+type ViewType = 'resume' | 'technical' | 'behavior';
 
 interface ProjectPageProps {
   onBack: () => void;
@@ -320,7 +318,7 @@ ${data.skills.join(' $\\bullet$ ')}
 
 export default function ProjectPage({ onBack }: ProjectPageProps) {
   const mountRef = useRef<HTMLDivElement>(null);
-  const [activeView, setActiveView] = useState<ViewType>('desk');
+  const [activeView, setActiveView] = useState<ViewType>('resume');
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [jobDescription, setJobDescription] = useState('');
 
@@ -335,20 +333,20 @@ export default function ProjectPage({ onBack }: ProjectPageProps) {
 
   // View Definitions
   const views: Record<ViewType, { title: string; pos: THREE.Vector3; look: THREE.Vector3 }> = {
-    desk: { 
-      title: "My Workstation", 
-      pos: new THREE.Vector3(0, 6, 14), 
-      look: new THREE.Vector3(0, 2, 0) 
+    resume: {
+      title: "Resume Builder",
+      pos: new THREE.Vector3(5, 5, 10),
+      look: new THREE.Vector3(-15, 5, 0)
     },
-    whiteboard: { 
-      title: "Brainstorming", 
-      pos: new THREE.Vector3(5, 5, 10), 
-      look: new THREE.Vector3(-15, 5, 0) 
+    technical: {
+      title: "Technical Questions",
+      pos: new THREE.Vector3(0, 6, 14),
+      look: new THREE.Vector3(0, 2, 0)
     },
-    window: { 
-      title: "View Outside", 
-      pos: new THREE.Vector3(-5, 5, 10), 
-      look: new THREE.Vector3(15, 6, 0) 
+    behavior: {
+      title: "Behavior Questions",
+      pos: new THREE.Vector3(-5, 5, 10),
+      look: new THREE.Vector3(15, 6, 0)
     }
   };
 
@@ -374,7 +372,7 @@ export default function ProjectPage({ onBack }: ProjectPageProps) {
     cameraRef.current = camera;
     
     // Set initial position based on default state
-    const initialView = views.desk;
+    const initialView = views.resume;
     camera.position.copy(initialView.pos);
     camera.lookAt(initialView.look);
     
@@ -578,49 +576,39 @@ export default function ProjectPage({ onBack }: ProjectPageProps) {
         
         {/* Main Grid */}
         <div className="ih-grid">
-            
-          {/* Sidebar */}
-          <aside className="ih-sidebar">
-            <button onClick={onBack} className="ih-back-btn" title="Back to Menu">
-              <ArrowLeft size={20} />
-            </button>
-
-            <div className="ih-logo">A</div>
-                
-            <button 
-              onClick={() => setActiveView('desk')} 
-              className={`ih-btn ${activeView === 'desk' ? 'active' : ''}`}
-            >
-              <Monitor size={24} />
-              <span className="ih-label">Desk View</span>
-            </button>
-                
-            <button 
-              onClick={() => setActiveView('whiteboard')} 
-              className={`ih-btn ${activeView === 'whiteboard' ? 'active' : ''}`}
-            >
-              <PenTool size={24} />
-              <span className="ih-label">Whiteboard</span>
-            </button>
-                
-            <button 
-              onClick={() => setActiveView('window')} 
-              className={`ih-btn ${activeView === 'window' ? 'active' : ''}`}
-            >
-              <Sun size={24} />
-              <span className="ih-label">Window View</span>
-            </button>
-
-            <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
-              <button className="ih-btn">
-                <Settings2 size={20} />
+          <div className="ih-topbar">
+            <div className="ih-topbar-left">
+              <button onClick={onBack} className="ih-back-btn" title="Back to Menu">
+                <ArrowLeft size={20} />
               </button>
-              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Profile" className="ih-profile" />
             </div>
-          </aside>
+            <div className="ih-topbar-buttons">
+              <button
+                onClick={() => setActiveView('resume')}
+                className={`ih-nav-btn ${activeView === 'resume' ? 'active' : ''}`}
+              >
+                <FileText size={18} />
+                <span>Resume Builder</span>
+              </button>
+              <button
+                onClick={() => setActiveView('technical')}
+                className={`ih-nav-btn ${activeView === 'technical' ? 'active' : ''}`}
+              >
+                <Settings2 size={18} />
+                <span>Technical Questions</span>
+              </button>
+              <button
+                onClick={() => setActiveView('behavior')}
+                className={`ih-nav-btn ${activeView === 'behavior' ? 'active' : ''}`}
+              >
+                <PenTool size={18} />
+                <span>Behavior Questions</span>
+              </button>
+            </div>
+          </div>
 
           <main className="ih-main">
-            {activeView === 'whiteboard' ? (
+            {activeView === 'resume' ? (
               <ResumeUpload 
                 resumeData={resumeData}
                 jobDescription={jobDescription}
@@ -632,8 +620,8 @@ export default function ProjectPage({ onBack }: ProjectPageProps) {
                 <div className="ih-placeholder-content">
                   <h2>{views[activeView].title}</h2>
                   <p>
-                    {activeView === 'desk' && 'Resume optimization in progress. Hop over to the whiteboard to upload your latest draft.'}
-                    {activeView === 'window' && 'Enjoy the view while your workspace stays in sync. Switch back to the whiteboard when you are ready to edit.'}
+                    {activeView === 'technical' && 'We will surface the most relevant technical interview questions for the job you are targeting. Hang tight while we wire this up.'}
+                    {activeView === 'behavior' && 'Behavioral prompts are getting polished. In the meantime, use the Resume Builder to tailor your profile.'}
                   </p>
                 </div>
               </div>
