@@ -1,5 +1,4 @@
 import os
-import re
 import mimetypes 
 from pathlib import Path
 
@@ -37,6 +36,7 @@ if not _loaded:
 
 class GeminiClient:
     """Gemini Client (Google Gen AI SDK v1.0+)"""
+    __instance = None 
 
     _IMAGE_EXTENSIONS = {
         ".png": "image/png",
@@ -48,7 +48,22 @@ class GeminiClient:
         ".heic": "image/heic",
     }
 
+    def __new__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+            cls.__instance._initialized = False  # set once to avoid re-initialization
+        return cls.__instance
+
+
     def __init__(self, model: str):
+        if getattr(self, "_initialized", False):
+            if model != self.model:
+                raise ValueError(
+                    "GeminiClient is a singleton and already initialized with model "
+                    f"'{self.model}'."
+                )
+            return
+
         self.model = model
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
@@ -56,6 +71,7 @@ class GeminiClient:
 
         # Initialize the new Client
         self.client = genai.Client(api_key=api_key)
+        self._initialized = True
 
     def upload_pdf(self, file_path: str, display_name: str | None = None):
         resolved_path = self._validate_path(file_path)
@@ -76,6 +92,16 @@ class GeminiClient:
         return self._upload_file(
             resolved_path,
             mime_type=image_mime,
+            display_name=display_name,
+        )
+
+    def upload_document(self, file_path: str, display_name: str | None = None, mime_type: str | None = None):
+        resolved_path = self._validate_path(file_path)
+        document_mime = mime_type or mimetypes.guess_type(resolved_path.name)[0] or "application/octet-stream"
+
+        return self._upload_file(
+            resolved_path,
+            mime_type=document_mime,
             display_name=display_name,
         )
 
@@ -114,3 +140,4 @@ class GeminiClient:
         
         mime, _ = mimetypes.guess_type(file_path.name)
         return mime
+    

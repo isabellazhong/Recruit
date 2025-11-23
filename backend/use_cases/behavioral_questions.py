@@ -1,11 +1,9 @@
 """Generate resume-aware behavioral interview questions with Gemini."""
-
 from __future__ import annotations
 
 import json
 from typing import TypedDict
-
-from gemini.gemini_client import GeminiClient
+from backend.gemini.gemini_client import GeminiClient
 from google.genai import types
 
 

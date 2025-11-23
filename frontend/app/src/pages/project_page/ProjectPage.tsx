@@ -2,11 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import type { ChangeEvent } from 'react';
 import * as THREE from 'three';
 import "./ProjectPage.css";
-import { uploadOriginalResume, updateLatestJobDescription } from '../../api/projects';
 import { 
-  Monitor, 
   PenTool, 
-  Sun, 
   Settings2, 
   ArrowLeft,
   Upload,
@@ -16,8 +13,10 @@ import {
   CheckCircle2,
   XCircle
 } from 'lucide-react';
+import TechnicalPractice from '../../components/project_page/TechnicalPractice';
+import { convertResumeToLatex, uploadOriginalResume } from '../../api/projects';
 
-type ViewType = 'desk' | 'whiteboard' | 'window';
+type ViewType = 'resume' | 'technical' | 'behavior';
 
 interface ProjectPageProps {
   onBack: () => void;
@@ -69,6 +68,8 @@ function ResumeUpload({ resumeData, jobDescription, onResumeUpdate, onJobDescrip
   const [uploading, setUploading] = useState(false);
   const [converting, setConverting] = useState(false);
   const [latexCode, setLatexCode] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState('');
   const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview');
   const [toast, setToast] = useState<ToastState>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -79,115 +80,77 @@ function ResumeUpload({ resumeData, jobDescription, onResumeUpdate, onJobDescrip
   };
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const inputEl = event.target;
+    const file = inputEl.files?.[0];
     if (!file) return;
 
     setUploading(true);
+    setSelectedFile(file);
+    setUploadedFileName(file.name);
+    setLatexCode('');
+    setActiveTab('preview');
+
+    const mockResumeData: ResumeData = {
+      name: 'Alex Developer',
+      email: 'alex.dev@email.com',
+      phone: '(555) 123-4567',
+      summary: 'Creative Software Engineer passionate about 3D web experiences and React.',
+      experience: [
+        {
+          title: 'Frontend Developer',
+          company: 'Creative Tech Labs',
+          duration: '2022 - Present',
+          description: 'Spearheaded the migration to React 18 and implemented 3D visualizations using Three.js.'
+        },
+        {
+          title: 'Junior Web Dev',
+          company: 'StartUp Inc',
+          duration: '2020 - 2022',
+          description: 'Built responsive UI components and optimized load times by 40%.'
+        }
+      ],
+      education: [
+        {
+          degree: 'BS Computer Science',
+          school: 'Tech University',
+          year: '2020'
+        }
+      ],
+      skills: ['JavaScript', 'TypeScript', 'React', 'Three.js', 'Tailwind CSS', 'Node.js']
+    };
+
+    onResumeUpdate(mockResumeData);
+
     try {
       await uploadOriginalResume(file);
-
-      const mockResumeData: ResumeData = {
-        name: 'Alex Developer',
-        email: 'alex.dev@email.com',
-        phone: '(555) 123-4567',
-        summary: 'Creative Software Engineer passionate about 3D web experiences and React.',
-        experience: [
-          {
-            title: 'Frontend Developer',
-            company: 'Creative Tech Labs',
-            duration: '2022 - Present',
-            description: 'Spearheaded the migration to React 18 and implemented 3D visualizations using Three.js.'
-          },
-          {
-            title: 'Junior Web Dev',
-            company: 'StartUp Inc',
-            duration: '2020 - 2022',
-            description: 'Built responsive UI components and optimized load times by 40%.'
-          }
-        ],
-        education: [
-          {
-            degree: 'BS Computer Science',
-            school: 'Tech University',
-            year: '2020'
-          }
-        ],
-        skills: ['JavaScript', 'TypeScript', 'React', 'Three.js', 'Tailwind CSS', 'Node.js']
-      };
-
-      onResumeUpdate(mockResumeData);
       showToast(`Uploaded ${file.name}`);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to upload resume';
-      showToast(message, 'error');
+      showToast(
+        (error as Error).message ?? 'Failed to save resume to the backend. You can still convert it.',
+        'error'
+      );
     } finally {
       setUploading(false);
-      if (event.target) {
-        event.target.value = '';
+      if (inputEl) {
+        inputEl.value = '';
       }
     }
   };
 
-  const generateLatexResume = (data: ResumeData, desc: string) => {
-    const text = desc || '';
-    const emphasizeSkills = text.toLowerCase().includes('react') || text.toLowerCase().includes('frontend');
-
-    return `\\documentclass[11pt,a4paper]{article}
-\\usepackage[margin=0.75in]{geometry}
-\\usepackage{enumitem}
-\\usepackage{hyperref}
-
-\\begin{document}
-
-\\begin{center}
-\\textbf{\\Large ${data.name}}\\\\
-\\vspace{2mm}
-${data.email} | ${data.phone}
-\\end{center}
-
-\\section*{Summary}
-${data.summary}${text ? ' (Tailored for: ' + text.substring(0, 30) + '...)' : ''}
-
-\\section*{Professional Experience}
-${data.experience.map(exp => `
-\\textbf{${exp.title}} \\hfill ${exp.duration}\\\\
-\\textit{${exp.company}}\\\\
-${exp.description}
-`).join('\n')}
-
-\\section*{Education}
-${data.education.map(edu => `
-\\textbf{${edu.degree}} \\hfill ${edu.year}\\\\
-${edu.school}
-`).join('\n')}
-
-\\section*{Technical Skills}
-${emphasizeSkills ? '\\textbf{Key Match: React, Three.js}\\\\' : ''}
-${data.skills.join(' $\\bullet$ ')}
-
-\\end{document}`;
-  };
-
   const convertToLatex = async () => {
-    if (!resumeData) {
+    if (!selectedFile) {
       showToast('Please upload a resume first', 'error');
       return;
     }
 
     setConverting(true);
     try {
-      const trimmedDesc = jobDescription.trim();
-      if (trimmedDesc) {
-        await updateLatestJobDescription(trimmedDesc);
-        showToast('Job description saved');
-      }
-
-      const latex = generateLatexResume(resumeData, jobDescription);
+      const { latex } = await convertResumeToLatex(selectedFile, jobDescription);
       setLatexCode(latex);
+      setActiveTab('code');
       showToast('Converted to LaTeX');
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to save job description';
-      showToast(message, 'error');
+      showToast((error as Error).message ?? 'Failed to convert resume', 'error');
     } finally {
       setConverting(false);
     }
@@ -239,10 +202,10 @@ ${data.skills.join(' $\\bullet$ ')}
               />
             </div>
 
-            {resumeData && (
+            {(uploadedFileName || resumeData) && (
               <div className="ih-uploaded-pill">
                 <FileText size={16} />
-                <span>Uploaded: {resumeData.name}</span>
+                <span>Uploaded: {uploadedFileName || resumeData?.name}</span>
               </div>
             )}
 
@@ -258,7 +221,7 @@ ${data.skills.join(' $\\bullet$ ')}
             <button
               className="ih-primary-btn"
               onClick={convertToLatex}
-              disabled={!resumeData || converting}
+              disabled={!selectedFile || converting}
             >
               <Sparkles size={18} />
               <span>{converting ? 'Optimizing...' : 'Convert & Optimize'}</span>
@@ -340,7 +303,7 @@ ${data.skills.join(' $\\bullet$ ')}
 
 export default function ProjectPage({ onBack }: ProjectPageProps) {
   const mountRef = useRef<HTMLDivElement>(null);
-  const [activeView, setActiveView] = useState<ViewType>('desk');
+  const [activeView, setActiveView] = useState<ViewType>('resume');
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [jobDescription, setJobDescription] = useState('');
 
@@ -355,20 +318,20 @@ export default function ProjectPage({ onBack }: ProjectPageProps) {
 
   // View Definitions
   const views: Record<ViewType, { title: string; pos: THREE.Vector3; look: THREE.Vector3 }> = {
-    desk: { 
-      title: "My Workstation", 
-      pos: new THREE.Vector3(0, 6, 14), 
-      look: new THREE.Vector3(0, 2, 0) 
+    resume: {
+      title: "Resume Builder",
+      pos: new THREE.Vector3(5, 5, 10),
+      look: new THREE.Vector3(-15, 5, 0)
     },
-    whiteboard: { 
-      title: "Brainstorming", 
-      pos: new THREE.Vector3(5, 5, 10), 
-      look: new THREE.Vector3(-15, 5, 0) 
+    technical: {
+      title: "Technical Questions",
+      pos: new THREE.Vector3(0, 6, 14),
+      look: new THREE.Vector3(0, 2, 0)
     },
-    window: { 
-      title: "View Outside", 
-      pos: new THREE.Vector3(-5, 5, 10), 
-      look: new THREE.Vector3(15, 6, 0) 
+    behavior: {
+      title: "Behavior Questions",
+      pos: new THREE.Vector3(-5, 5, 10),
+      look: new THREE.Vector3(15, 6, 0)
     }
   };
 
@@ -394,7 +357,7 @@ export default function ProjectPage({ onBack }: ProjectPageProps) {
     cameraRef.current = camera;
     
     // Set initial position based on default state
-    const initialView = views.desk;
+    const initialView = views.resume;
     camera.position.copy(initialView.pos);
     camera.lookAt(initialView.look);
     
@@ -598,62 +561,57 @@ export default function ProjectPage({ onBack }: ProjectPageProps) {
         
         {/* Main Grid */}
         <div className="ih-grid">
-            
-          {/* Sidebar */}
-          <aside className="ih-sidebar">
-            <button onClick={onBack} className="ih-back-btn" title="Back to Menu">
-              <ArrowLeft size={20} />
-            </button>
-
-            <div className="ih-logo">A</div>
-                
-            <button 
-              onClick={() => setActiveView('desk')} 
-              className={`ih-btn ${activeView === 'desk' ? 'active' : ''}`}
-            >
-              <Monitor size={24} />
-              <span className="ih-label">Desk View</span>
-            </button>
-                
-            <button 
-              onClick={() => setActiveView('whiteboard')} 
-              className={`ih-btn ${activeView === 'whiteboard' ? 'active' : ''}`}
-            >
-              <PenTool size={24} />
-              <span className="ih-label">Whiteboard</span>
-            </button>
-                
-            <button 
-              onClick={() => setActiveView('window')} 
-              className={`ih-btn ${activeView === 'window' ? 'active' : ''}`}
-            >
-              <Sun size={24} />
-              <span className="ih-label">Window View</span>
-            </button>
-
-            <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
-              <button className="ih-btn">
-                <Settings2 size={20} />
+          <div className="ih-topbar">
+            <div className="ih-topbar-left">
+              <button onClick={onBack} className="ih-back-btn" title="Back to Menu">
+                <ArrowLeft size={20} />
               </button>
-              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Profile" className="ih-profile" />
             </div>
-          </aside>
+            <div className="ih-topbar-buttons">
+              <button
+                onClick={() => setActiveView('resume')}
+                className={`ih-nav-btn ${activeView === 'resume' ? 'active' : ''}`}
+              >
+                <FileText size={18} />
+                <span>Resume Builder</span>
+              </button>
+              <button
+                onClick={() => setActiveView('technical')}
+                className={`ih-nav-btn ${activeView === 'technical' ? 'active' : ''}`}
+              >
+                <Settings2 size={18} />
+                <span>Technical Questions</span>
+              </button>
+              <button
+                onClick={() => setActiveView('behavior')}
+                className={`ih-nav-btn ${activeView === 'behavior' ? 'active' : ''}`}
+              >
+                <PenTool size={18} />
+                <span>Behavior Questions</span>
+              </button>
+            </div>
+          </div>
 
           <main className="ih-main">
-            {activeView === 'whiteboard' ? (
+            {activeView === 'resume' && (
               <ResumeUpload 
                 resumeData={resumeData}
                 jobDescription={jobDescription}
                 onResumeUpdate={setResumeData}
                 onJobDescriptionUpdate={setJobDescription}
               />
-            ) : (
+            )}
+
+            {activeView === 'technical' && (
+              <TechnicalPractice jobDescription={jobDescription} />
+            )}
+
+            {activeView === 'behavior' && (
               <div className="ih-placeholder">
                 <div className="ih-placeholder-content">
                   <h2>{views[activeView].title}</h2>
                   <p>
-                    {activeView === 'desk' && 'Resume optimization in progress. Hop over to the whiteboard to upload your latest draft.'}
-                    {activeView === 'window' && 'Enjoy the view while your workspace stays in sync. Switch back to the whiteboard when you are ready to edit.'}
+                    Behavior prompts are getting polished. In the meantime, use the Resume Builder to tailor your profile.
                   </p>
                 </div>
               </div>

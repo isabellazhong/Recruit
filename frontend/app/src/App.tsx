@@ -8,7 +8,7 @@ import ProjectPage from "./pages/project_page/ProjectPage";
 function App() {
   const navigator = useNavigate();
   const goBack = () => navigator('/home');
-
+  
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />

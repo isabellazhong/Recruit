@@ -1,4 +1,4 @@
-import { UploadCloud, FileText, X } from "lucide-react";
+import { FileText, X } from "lucide-react";
 import type { Dispatch, FormEventHandler, SetStateAction } from "react";
 import "../../pages/home_page/HomePage.css";
 
@@ -7,8 +7,8 @@ interface CreateProjectProps {
 	onSubmit: FormEventHandler<HTMLFormElement>;
 	currProjectTitle: string;
 	setTitle: Dispatch<SetStateAction<string>>;
-	jobFile: File | null;
-	setJobFile: Dispatch<SetStateAction<File | null>>;
+	jobDescription: string;
+	setJobDescription: Dispatch<SetStateAction<string>>;
 }
 
 export function CreateProjectPanel({
@@ -16,8 +16,8 @@ export function CreateProjectPanel({
 	onSubmit,
 	currProjectTitle,
 	setTitle,
-	jobFile,
-	setJobFile,
+	jobDescription,
+	setJobDescription,
 }: CreateProjectProps) {
     return (
         <div className="modal-overlay" role="dialog" aria-modal="true">
@@ -25,7 +25,7 @@ export function CreateProjectPanel({
 						<header className="modal-header">
 							<div>
 								<p className="eyebrow">New project</p>
-								<h3>Upload job description</h3>
+								<h3>Add job description</h3>
 							</div>
 							<button className="icon-btn" onClick={onClose} aria-label="Close">
 								<X size={18} />
@@ -45,35 +45,26 @@ export function CreateProjectPanel({
 								required
 							/>
 
-							<label className="input-label">Job description</label>
-							<label className="upload-zone">
-								<UploadCloud size={24} />
-								<p>
-									Drag & drop the file, or <span>browse</span>
-								</p>
-								<p className="upload-hint">PDF, DOCX, or TXT up to 5MB</p>
-								<input
-									type="file"
-									accept=".pdf,.doc,.docx,.txt"
-									onChange={(event) => setJobFile(event.target.files?.[0] ?? null)}
+							<label className="input-label" htmlFor="job-description">
+								Job description
+							</label>
+							<div className="text-area-wrapper">
+								<FileText size={18} />
+								<textarea
+									id="job-description"
+									placeholder="Paste the role overview, requirements, and responsibilities."
+									value={jobDescription}
+									onChange={(event) => setJobDescription(event.target.value)}
+									rows={6}
 									required
 								/>
-								{jobFile && (
-									<div className="upload-summary">
-										<FileText size={16} />
-										<div>
-											<strong>{jobFile.name}</strong>
-											<span>{(jobFile.size / 1024).toFixed(0)} KB</span>
-										</div>
-									</div>
-								)}
-							</label>
+							</div>
 
 							<div className="modal-actions">
 								<button type="button" className="secondary-btn" onClick={onClose}>
 									Cancel
 								</button>
-								<button type="submit" className="primary-btn" disabled={!currProjectTitle.trim() || !jobFile}>
+								<button type="submit" className="primary-btn" disabled={!currProjectTitle.trim() || !jobDescription.trim()}>
 									Create project
 								</button>
 							</div>

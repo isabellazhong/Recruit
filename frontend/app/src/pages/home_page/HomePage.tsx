@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import { UploadProject } from "../../components/home_page/UploadProjectPanel";
 import { CreateProjectPanel } from "../../components/home_page/CreateProjectPanel";
-import { uploadProject } from "../../api/projects";
 
 type Project = {
 	id: number;
@@ -22,33 +21,25 @@ export default function HomePage() {
 	const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [projectTitle, setProjectTitle] = useState("");
-	const [jobFile, setJobFile] = useState<File | null>(null);
+	const [jobDescription, setJobDescription] = useState("");
     const navigate = useNavigate(); 
     const openWorkspace = () => navigate('/workspace'); 
 
 
 	const handleCreateProject = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		const trimmedTitle = projectTitle.trim();
-		if (!trimmedTitle || !jobFile) return;
+		if (!projectTitle.trim()) return;
 
-		try {
-			const backendProject = await uploadProject(trimmedTitle, jobFile);
-			const newProject: Project = {
-				id: backendProject.id,
-				title: trimmedTitle,
-				role: "Custom role",
-				lastUpdated: "Just now",
-				jobDescriptionName: backendProject.job_description_name,
-			};
+		const newProject: Project = {
+			id: Date.now(),
+			title: projectTitle.trim(),
+			role: "Custom role",
+			lastUpdated: "Just now",
+		};
 
-			setProjects((prev) => [newProject, ...prev]);
-			setProjectTitle("");
-			setJobFile(null);
-			setIsModalOpen(false);
-		} catch (error) {
-			console.error("Failed to upload project", error);
-		}
+		setProjects((prev) => [newProject, ...prev]);
+		setProjectTitle("");
+		setIsModalOpen(false);
 	};
 
 	return (
@@ -89,8 +80,8 @@ export default function HomePage() {
 					onSubmit={handleCreateProject}
 					currProjectTitle={projectTitle}
 					setTitle={setProjectTitle}
-					jobFile={jobFile}
-					setJobFile={setJobFile}
+					jobDescription={jobDescription}
+					setJobDescription={setJobDescription}
 				/>
 			)}
 		</div>

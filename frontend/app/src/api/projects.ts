@@ -68,3 +68,65 @@ export async function updateLatestJobDescription(jobDescription: string): Promis
 
     return response.json();
 }
+
+export interface LatexConversionResponse {
+    latex: string;
+}
+
+export interface TechnicalQuestion {
+    id?: string;
+    title?: string;
+    difficulty?: string;
+    problem_description?: string;
+    starter_code?: string;
+    desc?: string;
+    tags?: string[];
+    input_output?: Array<{ input?: string; output?: string }>;
+    language?: string;
+}
+
+export async function convertResumeToLatex(resumeFile: File, jobDescription?: string): Promise<LatexConversionResponse> {
+    const formData = new FormData();
+    formData.append("resume", resumeFile);
+    if (jobDescription && jobDescription.trim()) {
+        formData.append("job_description", jobDescription.trim());
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/resume/latex`, {
+        method: "POST",
+        body: formData,
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to convert resume to LaTeX");
+    }
+
+    return response.json();
+}
+
+export async function fetchTechnicalQuestions(
+    jobDescription: string,
+    topK = 3,
+    signal?: AbortSignal,
+): Promise<TechnicalQuestion[]> {
+    const payload = {
+        job_description: jobDescription.trim(),
+        top_k: topK,
+    };
+
+    const response = await fetch(`${API_BASE_URL}/api/technical-questions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal,
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to fetch technical questions");
+    }
+
+    const data = await response.json();
+    return Array.isArray(data.questions) ? data.questions : [];
+}

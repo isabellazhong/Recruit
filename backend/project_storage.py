@@ -117,3 +117,26 @@ def replace_job_description(job_description: str) -> Dict[str, str | int]:
         "id": project_id,
         "job_desc_path": str(job_desc_path),
     }
+
+
+def load_latest_job_description() -> Tuple[int, str]:
+    """Return the latest project id and its job description text."""
+
+    PROJECTS_ROOT.mkdir(parents=True, exist_ok=True)
+    project_id, project_dir = _latest_project_dir(PROJECTS_ROOT)
+
+    job_desc_dir = project_dir / "job_desc"
+    if not job_desc_dir.is_dir():
+        raise FileNotFoundError("Latest project has no job description directory.")
+
+    job_desc_files = [path for path in job_desc_dir.iterdir() if path.is_file()]
+    if not job_desc_files:
+        raise FileNotFoundError("Job description directory is empty.")
+
+    job_desc_files.sort(key=lambda path: path.stat().st_mtime, reverse=True)
+    job_desc_path = job_desc_files[0]
+    contents = job_desc_path.read_text(encoding="utf-8").strip()
+    if not contents:
+        raise ValueError("Latest job description file is empty.")
+
+    return project_id, contents
