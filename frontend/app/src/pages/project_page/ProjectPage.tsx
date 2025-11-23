@@ -1,27 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import "./ProjectPage.css";
 import { 
   Monitor, 
   PenTool, 
   Sun, 
   Settings2, 
-  Zap, 
-  Calendar, 
-  CloudSun,
   ArrowLeft
 } from 'lucide-react';
-import '../App.css';
 
 type ViewType = 'desk' | 'whiteboard' | 'window';
 
-interface ImmersiveHomeProps {
+interface ProjectPageProps {
   onBack: () => void;
 }
 
-export default function ImmersiveHome({ onBack }: ImmersiveHomeProps) {
+export default function ProjectPage({ onBack }: ProjectPageProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const [activeView, setActiveView] = useState<ViewType>('desk');
-  const [time, setTime] = useState(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
 
   // Refs for 3D objects to access inside the animation loop without dependencies
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -50,14 +46,6 @@ export default function ImmersiveHome({ onBack }: ImmersiveHomeProps) {
       look: new THREE.Vector3(15, 6, 0) 
     }
   };
-
-  // --- Clock Effect ---
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // --- View Change Effect ---
   useEffect(() => {
