@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   CheckCircle2,
@@ -10,6 +9,8 @@ import {
   XCircle,
 } from 'lucide-react';
 import '../../pages/project_page/ProjectPage.css';
+import { fetchTechnicalQuestions } from '../../api/projects';
+import type { TechnicalQuestion } from '../../api/projects';
 
 type Difficulty = 'Easy' | 'Medium' | 'Hard';
 
@@ -22,18 +23,6 @@ interface TestCase {
 interface Sample {
   input: string;
   output: string;
-}
-
-interface BackendQuestion {
-  id?: string;
-  title?: string;
-  difficulty?: string;
-  problem_description?: string;
-  starter_code?: string;
-  desc?: string;
-  tags?: string[];
-  input_output?: Sample[];
-  language?: string;
 }
 
 interface Question {
@@ -62,14 +51,13 @@ interface TestRunResult extends TestCase {
   error?: string;
 }
 
-const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:8000';
 const TOP_K = 3;
 
-const normalizeBackendQuestion = (raw: BackendQuestion, index: number): Question => {
+const normalizeBackendQuestion = (raw: TechnicalQuestion, index: number): Question => {
   const samples = Array.isArray(raw.input_output)
     ? raw.input_output.map((sample) => ({
-        input: sample.input ?? '',
-        output: sample.output ?? '',
+        input: sample?.input ?? '',
+        output: sample?.output ?? '',
       }))
     : [];
 
@@ -160,14 +148,9 @@ export default function TechnicalPractice({ jobDescription }: TechnicalPracticeP
       setIsLoadingQuestions(true);
       setFetchError(null);
       try {
-        const { data } = await axios.post<{ questions?: BackendQuestion[] }>(
-          `${BACKEND_BASE_URL}/technical_questions`,
-          { job_description: trimmed, top_k: TOP_K },
-          { signal: controller.signal },
-        );
-        const payload = data;
-        const remoteQuestions = Array.isArray(payload.questions)
-          ? payload.questions.map((question: BackendQuestion, index: number) =>
+        const payload = await fetchTechnicalQuestions(trimmed, TOP_K, controller.signal);
+        const remoteQuestions = Array.isArray(payload)
+          ? payload.map((question: TechnicalQuestion, index: number) =>
               normalizeBackendQuestion(question, index),
             )
           : [];

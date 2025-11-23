@@ -95,6 +95,16 @@ class GeminiClient:
             display_name=display_name,
         )
 
+    def upload_document(self, file_path: str, display_name: str | None = None, mime_type: str | None = None):
+        resolved_path = self._validate_path(file_path)
+        document_mime = mime_type or mimetypes.guess_type(resolved_path.name)[0] or "application/octet-stream"
+
+        return self._upload_file(
+            resolved_path,
+            mime_type=document_mime,
+            display_name=display_name,
+        )
+
     def _upload_file(self, file_path: Path, mime_type: str, display_name: str | None) -> types.File:
         """
         Uploads to the File API.
