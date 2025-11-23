@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import { UploadProject } from "../../components/home_page/UploadProjectPanel";
 import { CreateProjectPanel } from "../../components/home_page/CreateProjectPanel";
+import { uploadProject } from "../../api/projects";
 
 type Project = {
 	id: number;
@@ -26,22 +27,28 @@ export default function HomePage() {
     const openWorkspace = () => navigate('/workspace'); 
 
 
-	const handleCreateProject = (event: FormEvent<HTMLFormElement>) => {
+	const handleCreateProject = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		if (!projectTitle.trim() || !jobFile) return;
+		const trimmedTitle = projectTitle.trim();
+		if (!trimmedTitle || !jobFile) return;
 
-		const newProject: Project = {
-			id: Date.now(),
-			title: projectTitle.trim(),
-			role: "Custom role",
-			lastUpdated: "Just now",
-			jobDescriptionName: jobFile.name,
-		};
+		try {
+			const backendProject = await uploadProject(trimmedTitle, jobFile);
+			const newProject: Project = {
+				id: backendProject.id,
+				title: trimmedTitle,
+				role: "Custom role",
+				lastUpdated: "Just now",
+				jobDescriptionName: backendProject.job_description_name,
+			};
 
-		setProjects((prev) => [newProject, ...prev]);
-		setProjectTitle("");
-		setJobFile(null);
-		setIsModalOpen(false);
+			setProjects((prev) => [newProject, ...prev]);
+			setProjectTitle("");
+			setJobFile(null);
+			setIsModalOpen(false);
+		} catch (error) {
+			console.error("Failed to upload project", error);
+		}
 	};
 
 	return (
