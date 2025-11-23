@@ -1,4 +1,5 @@
-from gemini.gemini_client import GeminiClient
+from backend.gemini.gemini_client import GeminiClient
+
 
 class JobFormatter:
     def __init__(self, client:GeminiClient, job_description: str):

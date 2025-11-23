@@ -1,4 +1,5 @@
-from gemini.gemini_client import GeminiClient
+from backend.gemini.gemini_client import GeminiClient
+
 import re
 from pathlib import Path
 
