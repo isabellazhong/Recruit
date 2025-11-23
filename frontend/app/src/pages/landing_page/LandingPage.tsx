@@ -40,7 +40,7 @@ export default function LandingPage() {
 					<div className="landing-nav__actions">
 		
 						<Button
-							label="GetStarted"
+							label="Get Started"
 							onClick={handlePrimaryAction}
 							className="landing-nav__cta"
 						/>
